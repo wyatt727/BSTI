@@ -1,0 +1,18 @@
+{
+    "scan_options": {
+        "always_use_sudo": true,
+        "default_timeouts": 600,
+        "default_scan_options": "-Pn -T4",
+        "skip_plugins": [],
+        "retry_options": "-Pn -T3 -sS"
+    },
+    "network_options": {
+        "allowed_ports": [22, 80, 443, 8080, 8443, 3389],
+        "ping_timeout": 2
+    },
+    "host_discovery": {
+        "pre_scan_ping": true,
+        "skip_host_discovery": false,
+        "max_retry_attempts": 3
+    }
+} 

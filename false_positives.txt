@@ -1,0 +1,14 @@
+SHA-1 is a weak hash known to have hash collisions.
+Found 11 critical permission(s)
+App uses SQLite Database and execute raw SQL query. Untrusted user input in raw SQL queries can cause SQL Injection. Also sensitive information should be encrypted and written to the database.
+The App uses an insecure Random Number Generator.
+This App may request root (Super User) privileges.
+MD5 is a weak hash known to have hash collisions.
+IP Address disclosure
+Application contains Privacy Trackers
+App can be installed on a vulnerable Android version
+The App uses the encryption mode CBC with PKCS5/PKCS7 padding. This configuration is vulnerable to padding oracle attacks.
+Application signed with debug certificate
+This app listens to Clipboard changes. Some malware also listen to Clipboard changes.
+This App copies data to clipboard. Sensitive data should not be copied to clipboard as other applications can access it.
+Application vulnerable to Janus Vulnerability

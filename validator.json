@@ -1,0 +1,18 @@
+{
+    "plugins": {
+        "Exported Broadcast Receivers": {
+            "xml_tags": ["receiver"],
+            "verify_words": ["android:exported=\"true\""]
+        },
+        "Exported Activies": {
+            "xml_tags": ["activity"],
+            "verify_words": ["android:exported=\"true\""]
+        },
+        "Backup Allowed": {
+            "xml_tags": ["application"],
+            "verify_words": ["android:allowBackup=\"true\""]
+        }
+    }
+}
+
+

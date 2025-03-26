@@ -1,0 +1,68 @@
+{
+    "workflows": {
+        "SSL Pinning Bypass (Windows)": {
+            "commands": [
+                {
+                    "title": "Patch APK",
+                    "command": "tools\\apk-mitm-windows.exe <full_path_to_apk>"
+                },
+                {
+                    "title": "ADB Reverse",
+                    "command": "adb.exe reverse tcp:8080 tcp:8080"
+                },
+                {
+                    "title": "Install Patched APK",
+                    "command": "adb.exe install <full_path_to_patched_apk>"
+                }
+            ]
+        },
+        "Install and Launch Drozer (Windows)": {
+            "commands": [
+                {
+                    "title": "Install Drozer on Device",
+                    "command": "adb.exe install tools\\drozer-agent.apk"
+                },
+                {
+                    "title": "Setup Port Forward",
+                    "command": "adb.exe forward tcp:31415 tcp:31415"
+                },
+                {
+                    "title": "Launch Drozer Console in PowerShell",
+                    "command": "powershell -NoExit -Command \"echo 'Start the Drozer server on the device, then press Enter to continue...'; Read-Host; drozer.bat console connect\""
+                }
+            ]
+        },
+        "SSL Pinning Bypass (Linux)": {
+            "commands": [
+                {
+                    "title": "Patch APK",
+                    "command": "tools/apk-mitm-linux <full_path_to_apk>"
+                },
+                {
+                    "title": "ADB Reverse",
+                    "command": "adb reverse tcp:8080 tcp:8080"
+                },
+                {
+                    "title": "Install Patched APK",
+                    "command": "adb install <full_path_to_patched_apk>"
+                }
+            ]
+        },
+        "Install and Launch Drozer (Linux)": {
+            "commands": [
+                {
+                    "title": "Install Drozer on Device",
+                    "command": "adb install tools/drozer-agent.apk"
+                },
+                {
+                    "title": "Setup Port Forward",
+                    "command": "adb forward tcp:31415 tcp:31415"
+                },
+                {
+                    "title": "Launch Drozer Console in Kitty",
+                    "command": "kitty --hold -e bash -c 'echo \"Start the Drozer server on the device, then press Enter to continue...\"; read; drozer console connect'"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,7 @@
+[[finding]]
+title = "IP Forwarding Enabled" 
+severity = "DELETE"
+
+[[finding]]
+title = "VMware ESXi 7.0 / 8.0 Out-of-Bounds read (CVE-2024-37086)"
+severity = "Low"

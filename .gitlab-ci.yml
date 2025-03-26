@@ -1,0 +1,46 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  RUBY_VERSION: "2.7"
+  BUNDLE_VERSION: "2.4.22"
+  JEKYLL_ENV: production
+
+cache:
+  paths:
+    - vendor/ruby
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y ruby-dev build-essential zlib1g-dev
+  - gem install bundler -v $BUNDLE_VERSION
+  - cd docs
+  - bundle install
+
+build:
+  stage: build
+  script:
+    - bundle exec jekyll build --source . --destination ../public --trace
+  artifacts:
+    paths:
+      - public
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to GitLab Pages..."
+  only:
+    - main
+
+pages:
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - echo "Serving the site from the public/ directory"
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

@@ -1,0 +1,24 @@
+{
+  "icons": {
+    "nmb": "NMB tab icon - sync/refresh symbol",
+    "drozer": "Drozer tab icon - shield/security symbol",
+    "explorer": "Explorer tab icon - magnifying glass",
+    "mobile": "Mobile Testing tab icon - smartphone",
+    "web": "Web Testing tab icon - globe",
+    "screenshot": "Screenshot Editor tab icon - camera",
+    "workflow": "Workflow Editor tab icon - chart/graph",
+    "plextrac": "PlexTrac tab icon - document/note"
+  },
+  "themes": [
+    "nord",
+    "dracula",
+    "light"
+  ],
+  "sizes": [
+    16,
+    24,
+    32,
+    48,
+    64
+  ]
+}

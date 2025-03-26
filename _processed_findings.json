@@ -1,0 +1,58 @@
+{
+    "19081594": {
+        "title": "Unsecured SSL/TLS Configuration",
+        "processed_timestamp": 1742905598.761481
+    },
+    "26999968": {
+        "title": "IP Forwarding Enabled",
+        "processed_timestamp": 1742905598.761483
+    },
+    "28541182": {
+        "title": "Software Components Out of Date and Vulnerable",
+        "processed_timestamp": 1742905598.7614841
+    },
+    "51701171": {
+        "title": "SSH Terrapin Prefix Truncation Weakness (CVE-2023-48795)",
+        "processed_timestamp": 1742905598.761485
+    },
+    "68098451": {
+        "title": "Network daemons not managed by the package system",
+        "processed_timestamp": 1742905598.761486
+    },
+    "79984773": {
+        "title": "Invalid X.509 (SSL/TLS) Certificate",
+        "processed_timestamp": 1742905598.761487
+    },
+    "94604593": {
+        "title": "Web Server HTTP Header Internal IP Disclosure",
+        "processed_timestamp": 1742905598.761489
+    },
+    "19081594": {
+        "title": "Unsecured SSL/TLS Configuration",
+        "processed_timestamp": 1742905869.613617
+    },
+    "26999968": {
+        "title": "IP Forwarding Enabled",
+        "processed_timestamp": 1742905869.613621
+    },
+    "28541182": {
+        "title": "Software Components Out of Date and Vulnerable",
+        "processed_timestamp": 1742905869.613622
+    },
+    "51701171": {
+        "title": "SSH Terrapin Prefix Truncation Weakness (CVE-2023-48795)",
+        "processed_timestamp": 1742905869.613624
+    },
+    "68098451": {
+        "title": "Network daemons not managed by the package system",
+        "processed_timestamp": 1742905869.613625
+    },
+    "79984773": {
+        "title": "Invalid X.509 (SSL/TLS) Certificate",
+        "processed_timestamp": 1742905869.613626
+    },
+    "94604593": {
+        "title": "Web Server HTTP Header Internal IP Disclosure",
+        "processed_timestamp": 1742905869.613626
+    }
+}

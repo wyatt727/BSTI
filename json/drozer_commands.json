@@ -1,0 +1,33 @@
+{
+    "commands": [
+        {"command": "app.package.attacksurface {package}", "help": "Get attack surface of package"},
+        {"command": "app.activity.info -a {package}", "help": "Gets information about exported activities"},
+        {"command": "app.broadcast.info -a {package}", "help": "Get information about broadcast receivers"},
+        {"command": "app.package.backup -f {package}", "help": "Lists packages that use the backup API (returns true on FLAG_ALLOW_BACKUP)"},
+        {"command": "app.package.debuggable -f {package}", "help": "Find debuggable packages"},
+        {"command": "app.package.info -a {package}", "help": "Get information about installed packages"},
+        {"command": "app.package.launchintent {package}", "help": "Get launch intent of package"},
+        {"command": "app.package.list -f {package}", "help": "List Packages"},
+        {"command": "app.package.manifest {package}", "help": "Get AndroidManifest.xml of package"},
+        {"command": "app.package.native {package}", "help": "Find Native libraries embedded in the application"},
+        {"command": "app.provider.columns {uri}", "help": "List columns in content provider"},
+        {"command": "app.provider.download {uri} {local_path}", "help": "Download a file from a content provider that supports files"},
+        {"command": "app.provider.finduri {package}", "help": "Find referenced content URIs in a package"},
+        {"command": "app.provider.info -a {package}", "help": "Get information about exported content providers"},
+        {"command": "app.provider.query {uri}", "help": "Query a content provider"},
+        {"command": "app.provider.read {uri}", "help": "Read from a content provider that supports files"},
+        {"command": "app.service.info -a {package}", "help": "Get information about exported services"},
+        {"command": "scanner.activity.browsable -a {package}", "help": "Get all BROWSABLE activities that can be invoked from the web browser"},
+        {"command": "scanner.misc.native -a {package}", "help": "Find native components included in packages"},
+        {"command": "scanner.misc.readablefiles /data -p", "help": "Find world-readable files in the given folder"},
+        {"command": "scanner.provider.finduris -a {package}", "help": "Search for content providers that can be queried from our context"},
+        {"command": "scanner.provider.injection -a {package}", "help": "Test content providers for SQL injection vulnerabilities"},
+        {"command": "scanner.provider.sqltables -a {package}", "help": "Find tables accessible through SQL injection vulnerabilities"},
+        {"command": "scanner.provider.traversal -a {package}", "help": "Test content providers for basic directory traversal vulnerabilities"},
+        {"command": "shell.exec {cmd}", "help": "Execute a single Linux command"},
+        {"command": "shell.send {ip} {port}", "help": "Send an ASH shell to a remote listener"},
+        {"command": "tools.file.download {source} {dest}", "help": "Download a File from the device to your machine"},
+        {"command": "tools.file.upload {source} {dest}", "help": "Upload a File from your machine to the device"},
+        {"command": "tools.setup.busybox", "help": "Install Busybox Busybox provides a number of *nix utilities that are missing from Android. Some modules require Busybox to be installed. Typically, you require root access to the device to install Busybox. drozer can install it from its restrictive context. You can then use 'busybox' in the when executing shell commands from drozer to use it."}
+    ]
+}

@@ -1,0 +1,17 @@
+title: BSTI
+baseurl: "/iss-cs-team/delivery-toolset/BSTI"
+permalink: pretty
+markdown: kramdown
+theme: just-the-docs
+color_scheme: dark
+
+# Plugins
+plugins:
+  - jekyll-feed
+
+just_the_docs:
+  aux_links:
+    "Source on GitLab": "https://gitlab.kevlar.bulletproofsi.net/iss-cs-team/delivery-toolset/BSTI"
+  search_enabled: true
+  search_label: 'Search the docs...'
+  color_scheme: dark

@@ -1,0 +1,14 @@
+{
+    "Broadcast Receiver () is not Protected. ": {
+        "id": 10000000,
+        "new_name": "Exported Broadcast Receivers"
+    },
+    "Activity () is not Protected. ": {
+        "id": 10000001,
+        "new_name": "Exported Activities"
+    },
+    "Application Data can be Backed up": {
+        "id": 10000002,
+        "new_name": "Missing Android Backup Flag"
+    }
+}

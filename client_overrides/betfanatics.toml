@@ -1,0 +1,11 @@
+[[finding]]
+title = "Unsecured SSL/TLS Configuration"
+severity = "Low"
+
+[[finding]]
+title = "Invalid X.509 (SSL/TLS) Certificate"
+severity = "Low"
+
+[[finding]]
+title = "DHCP Server Detection" 
+severity = "DELETE"
