@@ -1,0 +1,45 @@
+{
+    "client": {
+        "name": "ACME Corporation",
+        "report_prefix": "ACME",
+        "logo_path": "clients/acme/logo.png",
+        "contact": {
+            "primary": "John Doe",
+            "email": "john.doe@acme.example.com",
+            "phone": "+1-555-123-4567"
+        }
+    },
+    "tag_map": {
+        "internal": "acme_internal",
+        "external": "acme_external"
+    },
+    "reporting": {
+        "custom_fields": {
+            "client_id": "ACME001",
+            "project_code": "SEC-AUDIT-2023",
+            "department": "IT Security"
+        },
+        "severity_override": {
+            "10107": "Low",
+            "57582": "Critical"
+        }
+    },
+    "exclusions": {
+        "hosts": [
+            "test-server.acme.local",
+            "dev-web.acme.local"
+        ],
+        "plugins": [
+            "10264",
+            "11011"
+        ]
+    },
+    "overrides": {
+        "plugins": {
+            "default_web_server": {
+                "writeup_name": "ACME Web Server Configuration Issues",
+                "description": "Custom description for ACME web server findings."
+            }
+        }
+    }
+} 

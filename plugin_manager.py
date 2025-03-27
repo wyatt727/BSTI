@@ -95,7 +95,7 @@ class PluginManager:
         return findings
 
 
-    def identify_merged_findings(self):
+    def identify_merged_findings(self, no_informational=False):
         if not self.findings:
             log.warning("No findings loaded. Please select a CSV file first.")
             return {}, []
@@ -104,26 +104,38 @@ class PluginManager:
         individual_findings = set()
         plugin_categories = self.build_plugin_categories()
         
+        filtered_count = 0
         for finding in self.findings:
             plugin_id = finding['Plugin ID']
             name = finding['Name']
+            risk = finding['Risk']
             
-            if finding['Risk'] == self.IGNORE_INFORMATIONAL:
+            # Always ignore None risk findings
+            if risk == self.IGNORE_INFORMATIONAL:
                 continue
+                
+            # Skip informational findings if requested
+            if no_informational and risk.lower() in ['informational', 'info']:
+                filtered_count += 1
+                continue
+                
             if plugin_id == self.IGNORE_PLUGIN:  # Ignore the "Track/Trace" plugin
                 continue
             if plugin_id in plugin_categories:
                 if plugin_categories[plugin_id] not in merged_findings:
                     merged_findings[plugin_categories[plugin_id]] = set()
-                plugin_info = f"Plugin ID: {plugin_id}, Name: {name}"
+                plugin_info = f"Plugin ID: {plugin_id}, Name: {name}, Risk: {risk}"
                 merged_findings[plugin_categories[plugin_id]].add(plugin_info)
             else:
-                individual_findings.add(f"Plugin ID: {plugin_id}, Name: {name}")
+                individual_findings.add(f"Plugin ID: {plugin_id}, Name: {name}, Risk: {risk}")
                 
         for category in merged_findings:
             merged_findings[category] = list(merged_findings[category])
         individual_findings = list(individual_findings)
         
+        if filtered_count > 0:
+            log.info(f"Filtered out {filtered_count} informational findings")
+            
         return merged_findings, individual_findings
 
     def build_plugin_categories(self):
@@ -308,32 +320,45 @@ class PluginManager:
         return plugin_names
 
 
-    def simulate_findings(self):
-        if not self.findings:
-            log.warning("No findings loaded. Please select a CSV file first.")
-            return
+    def simulate_findings(self, no_informational=False):
+        """Simulate merged and individual findings."""
+        if not self.csv_path:
+            log.warning("No CSV file selected. Please select a CSV file first.")
+            return False
+        
+        merged_findings, individual_findings = self.identify_merged_findings(no_informational)
+        
+        log.info("==== Merged Findings ====")
+        if merged_findings:
+            for category, findings in merged_findings.items():
+                log.info(f"{category}: {len(findings)} plugins")
+        else:
+            log.info("No merged findings identified.")
+        
+        log.info("\n==== Individual Findings ====")
+        if individual_findings:
+            log.info(f"Total individual findings: {len(individual_findings)}")
+        else:
+            log.info("No individual findings identified.")
+        
+        # Print the detailed output when running in CLI mode
+        print("\n\n===== SIMULATION RESULTS =====")
+        print("\n==== Merged Findings ====")
+        if merged_findings:
+            for category, findings in merged_findings.items():
+                print(f"\n{category} ({len(findings)} findings):")
+                for finding in sorted(findings):
+                    print(f"  - {finding}")
+        else:
+            print("No merged findings identified.")
+        
+        print("\n==== Individual Findings ====")
+        if individual_findings:
+            print(f"Total individual findings: {len(individual_findings)}")
+            for finding in sorted(individual_findings):
+                print(f"  - {finding}")
             
-        merged_findings, individual_findings = self.identify_merged_findings()
-        print("\n" + "=" * 50)
-        print("     Simulated Merged and Individual Findings")
-        print("=" * 50)
-        
-        # Display Merged Findings
-        print("\nMerged Findings:")
-        for category, findings in merged_findings.items():
-            print(f"\n• {category}:")
-            for finding in findings:
-                print(f"  └── {finding}")
-        
-        # Display Individual Findings
-        print("\nIndividual Findings:")
-        for finding in individual_findings:
-            print(f"  • {finding}")
-
-        print("\n" + "=" * 50)
-        
-        # Return the findings for CLI use
-        return merged_findings, individual_findings
+        return True
 
 
 class ArgParser:
@@ -346,6 +371,7 @@ class ArgParser:
                          help='Action to perform in CLI mode')
         parser.add_argument('--category', type=str, help='Category name for adding or removing plugins')
         parser.add_argument('--plugin-ids', type=str, help='Comma-separated list of plugin IDs to add or remove')
+        parser.add_argument('--no-informational', action='store_true', help='Filter out Informational findings')
         return parser.parse_args()
 
 
@@ -419,7 +445,7 @@ def run_cli_action(manager, args):
             sys.exit(1)
     
     elif args.action == 'simulate':
-        manager.simulate_findings()
+        manager.simulate_findings(args.no_informational)
     
     elif args.action == 'add_plugin':
         if not args.category or not args.plugin_ids:

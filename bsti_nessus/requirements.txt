@@ -1,0 +1,14 @@
+# Core dependencies
+requests>=2.25.0
+colorama>=0.4.4
+tqdm>=4.60.0
+cryptography>=3.4.0
+keyring>=23.0.0
+
+# CLI and UI
+rich>=10.0.0
+
+# Test dependencies
+pytest>=6.2.0
+pytest-cov>=2.12.0
+pytest-mock>=3.6.0 

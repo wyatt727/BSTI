@@ -41,4 +41,5 @@ plugin_manager.py.bak
 /jadx
 apktool.jar
 /decompiled
-/tools
+/toolsGAN/
+GAN_*/

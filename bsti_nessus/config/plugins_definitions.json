@@ -1,0 +1,48 @@
+{
+    "plugins": {
+        "default_web_server": {
+            "writeup_name": "Insecure Web Server Configuration",
+            "description": "Multiple insecure web server configurations were detected that could lead to information disclosure or service disruption.",
+            "ids": ["10107", "10662", "10719", "11213", "22964", "84502", "99592"],
+            "additional_info": "Web servers with insecure configurations may expose sensitive information about the server, directories, or applications. This can help attackers plan more targeted attacks against the infrastructure.",
+            "mitigation_details": "1. Remove or disable unnecessary server headers and banners.\n2. Implement proper access controls and authentication mechanisms.\n3. Configure web servers to use HTTPS with strong TLS settings.\n4. Apply vendor-specific hardening guidelines for your web server.",
+            "references": [
+                "OWASP Top 10: A5:2017-Broken Access Control",
+                "CWE-16: Configuration",
+                "https://owasp.org/www-project-web-security-testing-guide/v41/4-Web_Application_Security_Testing/01-Information_Gathering/01-Conduct_Search_Engine_Discovery_Reconnaissance_for_Information_Leakage"
+            ],
+            "risk_rating": "Medium",
+            "remediation_effort": "Low"
+        },
+        "ssl_configuration": {
+            "writeup_name": "Insecure SSL/TLS Configuration",
+            "description": "Multiple SSL/TLS configuration issues were detected that could lead to man-in-the-middle attacks or information disclosure.",
+            "ids": ["15901", "20007", "42873", "51192", "57582", "83738", "84628", "94437"],
+            "additional_info": "SSL/TLS misconfigurations can lead to various attacks including downgrade attacks, man-in-the-middle interception, and information disclosure. Weak ciphers or protocols significantly reduce the security of encrypted communications.",
+            "mitigation_details": "1. Disable deprecated protocols (SSL 2.0, SSL 3.0, TLS 1.0, TLS 1.1).\n2. Enable and prefer strong cipher suites.\n3. Implement proper certificate validation.\n4. Enable features like HSTS, OCSP stapling, and Certificate Transparency.",
+            "references": [
+                "OWASP Top 10: A3:2017-Sensitive Data Exposure",
+                "CWE-327: Use of a Broken or Risky Cryptographic Algorithm",
+                "https://www.ssllabs.com/downloads/SSL_TLS_Deployment_Best_Practices.pdf",
+                "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Security_Cheat_Sheet.html"
+            ],
+            "risk_rating": "High",
+            "remediation_effort": "Medium"
+        },
+        "default_credentials": {
+            "writeup_name": "Default or Weak Credentials",
+            "description": "Systems were found using default, weak, or easily guessable credentials which could lead to unauthorized access.",
+            "ids": ["10481", "10862", "11424", "18095", "44332", "55472", "55790", "60119"],
+            "additional_info": "Default or weak credentials pose a significant risk as they are often the first thing attackers check when targeting a system. Published default credentials are widely available for most systems and applications.",
+            "mitigation_details": "1. Change all default passwords to strong, unique passwords.\n2. Implement a password policy requiring minimum complexity.\n3. Use multi-factor authentication where possible.\n4. Implement account lockout mechanisms.\n5. Regularly audit systems for default or weak credentials.",
+            "references": [
+                "OWASP Top 10: A2:2017-Broken Authentication",
+                "CWE-521: Weak Password Requirements",
+                "CWE-798: Use of Hard-coded Credentials",
+                "https://www.owasp.org/index.php/Testing_for_Default_Credentials_(OWASP-AT-004)"
+            ],
+            "risk_rating": "Critical",
+            "remediation_effort": "Low"
+        }
+    }
+} 

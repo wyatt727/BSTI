@@ -1,0 +1,39 @@
+{
+    "api": {
+        "plextrac": {
+            "base_url_template": "https://{instance}.kevlar.bulletproofsi.net/",
+            "timeout": 30,
+            "max_retries": 3,
+            "retry_delay": 2
+        }
+    },
+    "nessus": {
+        "severity_mapping": {
+            "Critical": 5,
+            "High": 4,
+            "Medium": 3,
+            "Low": 2,
+            "Informational": 1
+        },
+        "ignored_plugins": ["11213"]
+    },
+    "file_paths": {
+        "plextrac_format": "plextrac_format.csv",
+        "processed_findings": "_processed_findings.json",
+        "existing_flaws": "existing_flaws.json",
+        "screenshot_dir": "screenshots"
+    },
+    "tag_map": {
+        "internal": "internal_finding",
+        "external": "external_finding",
+        "surveillance": "surveillance_finding",
+        "web": "webapp_finding",
+        "mobile": "mobileapp_finding"
+    },
+    "plugin_categories": "plugins_definitions.json",
+    "logging": {
+        "level": "INFO",
+        "format": "[%(levelname)s] %(message)s",
+        "file": "bsti_nessus.log"
+    }
+} 
