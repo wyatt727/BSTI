@@ -23,6 +23,9 @@ class CustomLogger(logging.Logger):
         if self.isEnabledFor(self.SUCCESS):
             self._log(self.SUCCESS, msg, args, **kwargs)
 
+# For backward compatibility
+Logger = CustomLogger
+
 # Register our custom logger class
 logging.setLoggerClass(CustomLogger)
 

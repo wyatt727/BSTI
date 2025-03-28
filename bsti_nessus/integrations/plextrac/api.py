@@ -13,7 +13,7 @@ class PlextracAPI:
     """
     Plextrac API client for authentication and interaction with the Plextrac API.
     """
-    def __init__(self, instance: str, http_client: HTTPClient = None):
+    def __init__(self, instance: str, http_client: Optional[HTTPClient] = None):
         """
         Initialize the Plextrac API client.
         

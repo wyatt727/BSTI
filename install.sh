@@ -1,5 +1,7 @@
 #!/bin/bash
 # BSTI Nessus to Plextrac Converter Installation Script
+# Original implementation by Connor Fancy
+# This script is part of a refactored version of the original BSTI toolset
 # This script installs the BSTI Nessus tool and its dependencies
 
 set -e  # Exit on error
@@ -117,5 +119,8 @@ EOF
     echo -e "For convenience, you can also use: ${BLUE}./activate_bsti.sh${NC}"
 fi
 
+echo
+echo -e "${YELLOW}Verify your installation:${NC}"
+echo -e "  ${BLUE}python check_installation.py${NC}"
 echo
 echo -e "${BLUE}Thank you for installing BSTI Nessus to Plextrac Converter!${NC}" 

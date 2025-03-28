@@ -75,8 +75,12 @@ class CredentialManager:
                 self.logger.warning("keyring package not available, falling back to file storage")
         
         # Fall back to file-based storage
-        self._backend = FileBackend(self.service_name, self.logger)
+        self._backend = EncryptedFileBackend(self.service_name, self.logger)
         self.logger.info("Using encrypted file-based credential storage")
+    
+    def _initialize_backend(self) -> None:
+        """Alias for _init_backend to maintain backward compatibility with tests"""
+        return self._init_backend()
     
     def store_credentials(self, username: str, password: str, instance: str) -> bool:
         """
@@ -90,7 +94,11 @@ class CredentialManager:
         Returns:
             bool: True if credentials were stored successfully
         """
-        return self._backend.store(username, password, instance)
+        try:
+            return self._backend.store(instance, username, password)
+        except Exception as e:
+            self.logger.error(f"Failed to store credentials for {instance}: {str(e)}")
+            return False
     
     def get_credentials(self, instance: str) -> Tuple[Optional[str], Optional[str]]:
         """
@@ -102,7 +110,11 @@ class CredentialManager:
         Returns:
             Tuple of (username, password) or (None, None) if not found
         """
-        return self._backend.get(instance)
+        try:
+            return self._backend.get(instance)
+        except Exception as e:
+            self.logger.error(f"Failed to retrieve credentials for {instance}: {str(e)}")
+            return None, None
     
     def delete_credentials(self, instance: str) -> bool:
         """
@@ -114,7 +126,11 @@ class CredentialManager:
         Returns:
             bool: True if credentials were deleted successfully
         """
-        return self._backend.delete(instance)
+        try:
+            return self._backend.delete(instance)
+        except Exception as e:
+            self.logger.error(f"Failed to delete credentials for {instance}: {str(e)}")
+            return False
     
     def list_instances(self) -> List[str]:
         """
@@ -140,13 +156,27 @@ class CredentialBackend:
         self.service_name = service_name
         self.logger = logger
     
-    def store(self, username: str, password: str, instance: str) -> bool:
-        """Store credentials"""
+    def store(self, instance: str, username: str, password: str) -> bool:
+        """
+        Store credentials
+        
+        Args:
+            instance: Plextrac instance identifier
+            username: Username for authentication
+            password: Password for authentication
+            
+        Returns:
+            bool: True if credentials were stored successfully
+        """
         raise NotImplementedError("Subclasses must implement store()")
     
     def get(self, instance: str) -> Tuple[Optional[str], Optional[str]]:
         """Retrieve credentials"""
         raise NotImplementedError("Subclasses must implement get()")
+    
+    def retrieve(self, instance: str) -> Tuple[Optional[str], Optional[str]]:
+        """Alias for get() to maintain compatibility with test expectations"""
+        return self.get(instance)
     
     def delete(self, instance: str) -> bool:
         """Delete credentials"""
@@ -166,7 +196,7 @@ class KeychainBackend(CredentialBackend):
         import keyring
         self.keyring = keyring
     
-    def store(self, username: str, password: str, instance: str) -> bool:
+    def store(self, instance: str, username: str, password: str) -> bool:
         """Store credentials in macOS Keychain"""
         try:
             # Store username and password
@@ -200,6 +230,10 @@ class KeychainBackend(CredentialBackend):
         except Exception as e:
             self.logger.error(f"Failed to retrieve credentials: {str(e)}")
             return None, None
+    
+    def retrieve(self, instance: str) -> Tuple[Optional[str], Optional[str]]:
+        """Alias for get() to maintain compatibility with test expectations"""
+        return self.get(instance)
     
     def delete(self, instance: str) -> bool:
         """Delete credentials from macOS Keychain"""
@@ -250,7 +284,7 @@ class SecretServiceBackend(KeychainBackend):
         super().__init__(service_name, logger)
 
 
-class FileBackend(CredentialBackend):
+class EncryptedFileBackend(CredentialBackend):
     """Encrypted file-based credential storage backend"""
     
     def __init__(self, service_name: str, logger: Logger):
@@ -337,7 +371,7 @@ class FileBackend(CredentialBackend):
         self._master_key = key
         return key
     
-    def store(self, username: str, password: str, instance: str) -> bool:
+    def store(self, instance: str, username: str, password: str) -> bool:
         """Store credentials in encrypted file"""
         try:
             # Load existing credentials if any

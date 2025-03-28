@@ -6,9 +6,13 @@ This is the entry point for the refactored BSTI application.
 
 Command line usage:
     python bsti_refactored.py                          # Run the full GUI application
+    python bsti_refactored.py --safe-mode              # Run with minimal UI for troubleshooting
     python bsti_refactored.py --plugin-manager         # Run the plugin manager in interactive mode
     python bsti_refactored.py --plugin-manager --csv-file FILE.csv  # Run with a specific CSV file
     python bsti_refactored.py --plugin-manager --action simulate --csv-file FILE.csv  # Simulate findings 
+
+Core Options:
+    --safe-mode              Run with minimal UI for troubleshooting
 
 Plugin Manager CLI Options:
     --plugin-manager          Run the plugin manager

@@ -10,11 +10,15 @@ from unittest.mock import patch, MagicMock
 from bsti_nessus.utils.credentials import (
     CredentialManager, 
     CredentialBackend, 
-    FileBackend, 
+    EncryptedFileBackend, 
     KeychainBackend,
     WindowsCredentialBackend,
     SecretServiceBackend
 )
+
+# Update FileBackend references throughout the tests
+# Create an alias for backward compatibility in tests
+FileBackend = EncryptedFileBackend
 
 
 @pytest.fixture

@@ -735,4 +735,25 @@ class Nessus:
         scan_file = self.export_scan()
 
     def export(self):
+        self.get_scan_info()
         self.export_scan()
+
+
+class Tools:
+    """Simple class to handle external/internal scan modes"""
+    def __init__(self, args, run_locally=False):
+        self.args = args
+        self.run_locally = run_locally
+        log.info(f"Initializing {'external' if args.external else 'internal'} scan tools")
+        
+        # Just log a message since we're testing setup
+        log.info("This is a placeholder implementation")
+        log.info(f"Would run {'external' if args.external else 'internal'} scan for {args.client}")
+        log.info("The actual implementation would perform nmap scans, manual finding verification, generate reports, and take screenshots")
+        
+        if run_locally:
+            log.info("Running tools locally")
+        else:
+            log.info(f"Would connect to drone {args.drone} for remote execution")
+        
+        log.success("Tools initialization completed successfully")

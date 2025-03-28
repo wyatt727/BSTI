@@ -1,0 +1,98 @@
+.TH BSTI-REFACTORED 1 "April 2023" "BSTI" "BSTI User Manual"
+.SH NAME
+bsti_refactored \- BlackStack Testing Interface (Refactored)
+.SH SYNOPSIS
+.B bsti_refactored
+.RI [ OPTIONS ]
+.SH DESCRIPTION
+.B BSTI
+is a comprehensive testing interface for security professionals. It provides a GUI for managing security testing workflows, including Nessus scanning, PlexTrac integration, and module execution.
+.PP
+The refactored version provides a more modular and maintainable codebase with enhanced functionality.
+.SH OPTIONS
+.TP
+.B --safe-mode
+Run with minimal UI for troubleshooting when the normal mode encounters errors.
+.TP
+.B --plugin-manager
+Run the plugin manager instead of the main GUI application.
+.TP
+.BI "--csv-file " FILE.csv
+Path to the CSV file containing findings for the plugin manager.
+.TP
+.BI "--action " ACTION
+Action to perform with the plugin manager. Valid actions are:
+.RS
+.IP \(bu 2
+select_csv: Select a CSV file to work with
+.IP \(bu 2
+simulate: Simulate which findings will be merged based on current configuration
+.IP \(bu 2
+add_plugin: Add plugins to a specific category
+.IP \(bu 2
+remove_plugin: Remove plugins from a specific category
+.IP \(bu 2
+view_changes: View pending changes made during the current session
+.IP \(bu 2
+write_changes: Save pending changes to the configuration file
+.IP \(bu 2
+clear_changes: Discard pending changes
+.RE
+.TP
+.BI "--category " CATEGORY
+Category name for adding or removing plugins (used with add_plugin and remove_plugin actions).
+.TP
+.BI "--plugin-ids " ID1,ID2,...
+Comma-separated list of plugin IDs (used with add_plugin and remove_plugin actions).
+.SH EXAMPLES
+.PP
+Run the full GUI application:
+.PP
+.RS
+.nf
+python bsti_refactored.py
+.fi
+.RE
+.PP
+Run the plugin manager in interactive mode:
+.PP
+.RS
+.nf
+python bsti_refactored.py --plugin-manager
+.fi
+.RE
+.PP
+Simulate findings with a specific CSV file:
+.PP
+.RS
+.nf
+python bsti_refactored.py --plugin-manager --csv-file findings.csv --action simulate
+.fi
+.RE
+.PP
+Add plugins to a category:
+.PP
+.RS
+.nf
+python bsti_refactored.py --plugin-manager --action add_plugin --category "SSH" --plugin-ids "10881,10862"
+.fi
+.RE
+.SH FILES
+.TP
+.I N2P_config.json
+Configuration file used by the plugin manager.
+.TP
+.I temp/
+Directory for temporary files created during operation.
+.SH AUTHORS
+The BSTI development team.
+.SH BUGS
+Please report bugs to the GitHub issue tracker.
+.SH SEE ALSO
+Full documentation can be found in the docs directory:
+.IP \(bu 2
+docs/bsti_refactored_usage.md \- Full usage guide
+.IP \(bu 2
+docs/plugin_manager.md \- Plugin manager documentation
+.IP \(bu 2
+DEVGUIDE.md \- Development guide 

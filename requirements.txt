@@ -1,3 +1,4 @@
+# Core dependencies
 paramiko==3.4.1
 PyQt5==5.15.11
 htmlwebshot==0.1.2
@@ -17,3 +18,15 @@ toml==0.10.2
 pyaxmlparser==0.3.31
 blessed==1.20.0
 tqdm==4.66.1
+
+# CLI and UI
+rich>=10.0.0
+colorama>=0.4.4
+
+# Security tools
+keyring>=23.0.0
+
+# Testing
+pytest>=6.2.0
+pytest-cov>=2.12.0
+pytest-mock>=3.6.0

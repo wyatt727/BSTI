@@ -109,5 +109,8 @@ if /i "%use_venv%"=="Y" (
 )
 
 echo.
+echo Note: You can verify your installation by running:
+echo   python check_installation.py
+echo.
 echo Thank you for installing BSTI Nessus to Plextrac Converter!
 pause 

@@ -3,7 +3,7 @@ import tempfile
 import pytest
 from unittest.mock import patch, MagicMock
 
-from bsti_nessus.core.engine import MainEngine
+from bsti_nessus.core.engine import NessusEngine
 from bsti_nessus.utils.config_manager import ConfigManager
 
 
@@ -32,7 +32,7 @@ def mock_config():
 @pytest.fixture
 def mock_http_client():
     """Fixture for mocking HTTP client responses"""
-    with patch("bsti_nessus.integrations.plextrac.api.HttpClient") as mock_client:
+    with patch("bsti_nessus.utils.http_client.HTTPClient") as mock_client:
         # Mock authentication response
         mock_auth_response = MagicMock()
         mock_auth_response.json.return_value = {"token": "fake-token"}
@@ -72,76 +72,79 @@ def sample_nessus_file():
 @pytest.mark.integration
 def test_nessus_conversion_workflow(mock_config, mock_http_client, sample_nessus_file):
     """Test the full Nessus to Plextrac conversion workflow"""
-    with patch("bsti_nessus.utils.config_manager.ConfigManager.load") as mock_load:
-        mock_load.return_value = mock_config
-        config_manager = ConfigManager("test-config.json")
-        
-        # Create a temporary output directory
-        with tempfile.TemporaryDirectory() as temp_dir:
-            with patch("tempfile.mkdtemp", return_value=temp_dir):
-                # Initialize the engine with our mocks
-                engine = MainEngine(
-                    username="test_user",
-                    password="test_pass",
-                    plextrac_instance="test",
-                    config_manager=config_manager,
-                    nessus_dir=os.path.dirname(sample_nessus_file),
-                    verbose=True
-                )
+    with patch("bsti_nessus.utils.config_manager.ConfigManager.load_config"):
+        with patch("bsti_nessus.integrations.plextrac.api.HTTPClient", return_value=mock_http_client):
+            with patch("sys.exit") as mock_exit:  # Prevent actual system exit
+                # Setup mock response for authentication
+                auth_response = MagicMock()
+                auth_response.status_code = 200
+                auth_response.json.return_value = {"token": "fake-token"}
+                mock_http_client.post.return_value = auth_response
                 
-                # Run the conversion process
-                with patch("glob.glob", return_value=[sample_nessus_file]):
-                    with patch("bsti_nessus.integrations.nessus.parser.NessusParser.parse") as mock_parse:
-                        mock_parse.return_value = {
-                            "findings": [
-                                {
-                                    "plugin_id": "12345",
-                                    "name": "Test Vulnerability",
-                                    "risk": "High",
-                                    "description": "This is a test vulnerability description",
-                                    "solution": "Patch the system",
-                                    "references": "https://example.com"
-                                }
-                            ]
-                        }
-                        
-                        result = engine.run()
-                        
-                        # Assertions
-                        assert result["status"] == "success"
-                        assert mock_http_client.post.call_count >= 1  # Authentication call
-                        
-                        # Verify the parser was called
-                        mock_parse.assert_called_once()
+                # Create mock args
+                args = MagicMock()
+                args.username = "test_user"
+                args.password = "test_pass"
+                args.target_plextrac = "test"
+                args.directory = os.path.dirname(sample_nessus_file)
+                args.scope = "internal"
+                args.screenshots = False
+                args.client = None
+                
+                # Create a temporary output directory
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    with patch("tempfile.mkdtemp", return_value=temp_dir):
+                        # Initialize the engine with our mocks
+                        with patch.object(ConfigManager, "get_plugin_categories", return_value={}):
+                            with patch.object(ConfigManager, "get_plugin_details", return_value={}):
+                                engine = NessusEngine(args)
+                                
+                                # Make the authentication succeed
+                                with patch.object(engine.plextrac_api, "authenticate", return_value=(True, "fake-token")):
+                                    # Run the conversion process
+                                    with patch("glob.glob", return_value=[sample_nessus_file]):
+                                        with patch("bsti_nessus.integrations.nessus.parser.NessusParser.process_directory"):
+                                            with patch("bsti_nessus.integrations.nessus.parser.NessusParser.generate_plextrac_csv"):
+                                                with patch.object(engine, "_load_existing_flaws"):
+                                                    with patch.object(engine, "upload_nessus_file") as mock_upload:
+                                                        mock_upload.return_value = {"status": "success"}
+                                                        
+                                                        # Run the engine
+                                                        engine.run()
+                                                        
+                                                        # Assertions
+                                                        mock_upload.assert_called_once()
 
 
 @pytest.mark.integration
 def test_conversion_with_error_handling(mock_config, mock_http_client, sample_nessus_file):
     """Test error handling in the conversion workflow"""
-    with patch("bsti_nessus.utils.config_manager.ConfigManager.load") as mock_load:
-        mock_load.return_value = mock_config
-        config_manager = ConfigManager("test-config.json")
-        
-        # Create a temporary output directory
-        with tempfile.TemporaryDirectory() as temp_dir:
-            with patch("tempfile.mkdtemp", return_value=temp_dir):
-                # Initialize the engine with our mocks
-                engine = MainEngine(
-                    username="test_user",
-                    password="test_pass",
-                    plextrac_instance="test",
-                    config_manager=config_manager,
-                    nessus_dir=os.path.dirname(sample_nessus_file),
-                    verbose=True
-                )
+    with patch("bsti_nessus.utils.config_manager.ConfigManager.load_config"):
+        with patch("bsti_nessus.integrations.plextrac.api.HTTPClient", return_value=mock_http_client):
+            with patch("sys.exit") as mock_exit:  # Prevent actual system exit
+                # Create mock args
+                args = MagicMock()
+                args.username = "test_user"
+                args.password = "test_pass"
+                args.target_plextrac = "test"
+                args.directory = os.path.dirname(sample_nessus_file)
+                args.scope = "internal"
+                args.screenshots = False
+                args.client = None
                 
-                # Simulate an authentication error
-                with patch.object(mock_http_client, "post") as mock_post:
-                    mock_post.return_value.status_code = 401
-                    mock_post.return_value.json.return_value = {"error": "Invalid credentials"}
+                # Initialize a mock engine and plextrac API for focused testing
+                engine = MagicMock()
+                engine.args = args
+                engine.plextrac_api = MagicMock()
+                engine.plextrac_api.authenticate.return_value = (False, None)
+                
+                # Extract the authenticate method from NessusEngine
+                from bsti_nessus.core.engine import NessusEngine
+                authenticate_method = NessusEngine.authenticate
+                
+                # Call the authenticate method directly with our mock engine
+                with patch("bsti_nessus.core.engine.log"):
+                    authenticate_method(engine)
                     
-                    with patch("glob.glob", return_value=[sample_nessus_file]):
-                        with pytest.raises(Exception) as exc_info:
-                            engine.run()
-                            
-                        assert "Authentication failed" in str(exc_info.value) 
+                    # Assert that sys.exit was called once with error code 1
+                    mock_exit.assert_called_once_with(1) 

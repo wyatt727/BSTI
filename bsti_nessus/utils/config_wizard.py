@@ -117,6 +117,55 @@ class ConfigWizard:
             return False
         return True
     
+    def validate_url(self, url: str) -> bool:
+        """
+        Public wrapper for _validate_url
+        
+        Args:
+            url: URL to validate
+            
+        Returns:
+            True if URL is valid, False otherwise
+        """
+        return self._validate_url(url)
+    
+    def validate_integer(self, value: str) -> Optional[int]:
+        """
+        Validate and convert a string to an integer
+        
+        Args:
+            value: String value to convert
+            
+        Returns:
+            Integer value or None if invalid
+        """
+        try:
+            int_value = int(value)
+            if int_value >= 0:
+                return int_value
+            self.logger.warning("Value must be a positive integer")
+            return None
+        except ValueError:
+            self.logger.warning("Value must be a valid integer")
+            return None
+            
+    def validate_log_level(self, level: str) -> Optional[str]:
+        """
+        Validate log level
+        
+        Args:
+            level: Log level to validate
+            
+        Returns:
+            Valid log level or None if invalid
+        """
+        valid_levels = ["debug", "info", "warning", "error", "critical"]
+        level = level.lower()
+        if level in valid_levels:
+            return level
+        self.logger.warning(f"Log level must be one of: {', '.join(valid_levels)}")
+        return None
+    
     def _configure_plextrac_instances(self) -> Dict[str, Dict[str, Any]]:
         """
         Configure Plextrac instances
@@ -177,7 +226,8 @@ class ConfigWizard:
                     "optional_fields", 
                     ["Solution", "See Also"]
                 )
-            }
+            },
+            "categories": existing_settings.get("categories", {})
         }
         
         customize = self._get_boolean_input("Customize Nessus CSV field settings?", False)
@@ -202,11 +252,62 @@ class ConfigWizard:
                 field.strip() for field in optional_str.split(",") if field.strip()
             ]
         
+        # Configure plugin categories
+        configure_categories = self._get_boolean_input("Configure Nessus plugin categorization?", False)
+        if configure_categories:
+            self.logger.info("Plugin categories help organize findings by type")
+            
+            # Allow updating existing categories
+            if settings["categories"]:
+                self.logger.info(f"Found {len(settings['categories'])} existing categories")
+                for category_id, category_info in list(settings["categories"].items()):
+                    keep = self._get_boolean_input(
+                        f"Keep category '{category_id}' ({category_info.get('display_name')})?", 
+                        True
+                    )
+                    if not keep:
+                        del settings["categories"][category_id]
+            
+            # Add new categories
+            add_more = self._get_boolean_input("Add a new plugin category?", not bool(settings["categories"]))
+            while add_more:
+                category_id = self._get_input("Category ID (e.g., 'network', 'webapp')")
+                
+                if category_id in settings["categories"]:
+                    self.logger.warning(f"Category '{category_id}' already exists")
+                    continue
+                
+                display_name = self._get_input(f"Display name for '{category_id}'")
+                description = self._get_input(f"Description for '{category_id}'", default="")
+                
+                plugin_ids_str = self._get_input(
+                    f"Plugin IDs for '{category_id}' (comma-separated list)",
+                    default=""
+                )
+                
+                plugin_ids = []
+                if plugin_ids_str:
+                    try:
+                        plugin_ids = [
+                            int(pid.strip()) for pid in plugin_ids_str.split(",") 
+                            if pid.strip().isdigit()
+                        ]
+                    except ValueError:
+                        self.logger.warning("Invalid plugin ID format, should be integers")
+                
+                settings["categories"][category_id] = {
+                    "display_name": display_name,
+                    "description": description,
+                    "plugin_ids": plugin_ids
+                }
+                
+                add_more = self._get_boolean_input("Add another plugin category?", False)
+        
         return settings
     
     def _configure_general_settings(self) -> Dict[str, Any]:
         """
-        Configure general application settings
+        Configure general settings
         
         Returns:
             Dictionary of general settings
@@ -214,37 +315,272 @@ class ConfigWizard:
         existing_settings = self.config.get("general", {})
         
         settings = {
-            "tmp_dir": existing_settings.get("tmp_dir", "/tmp/bsti_nessus"),
-            "cleanup_tmp": existing_settings.get("cleanup_tmp", True),
-            "log_level": existing_settings.get("log_level", "INFO")
+            "timeout": existing_settings.get("timeout", 30),
+            "threads": existing_settings.get("threads", 4),
+            "log_level": existing_settings.get("log_level", "info")
         }
         
         customize = self._get_boolean_input("Customize general settings?", False)
         if customize:
-            settings["tmp_dir"] = self._get_input(
-                "Temporary directory path", 
-                default=settings["tmp_dir"]
+            # Default timeout
+            timeout = self._get_input(
+                "Default timeout (seconds)",
+                default=str(settings["timeout"]),
+                validator=lambda x: self.validate_integer(x) is not None
             )
+            settings["timeout"] = self.validate_integer(timeout)
             
-            settings["cleanup_tmp"] = self._get_boolean_input(
-                "Clean up temporary files after processing?", 
-                default=settings["cleanup_tmp"]
+            # Default thread count
+            threads = self._get_input(
+                "Default thread count",
+                default=str(settings["threads"]),
+                validator=lambda x: self.validate_integer(x) is not None
             )
+            settings["threads"] = self.validate_integer(threads)
             
-            log_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-            while True:
-                log_level = self._get_input(
-                    f"Log level ({', '.join(log_levels)})", 
-                    default=settings["log_level"]
-                ).upper()
-                
-                if log_level in log_levels:
-                    settings["log_level"] = log_level
-                    break
-                else:
-                    self.logger.warning(f"Invalid log level. Choose from: {', '.join(log_levels)}")
+            # Default log level
+            log_level = self._get_input(
+                "Default log level (debug, info, warning, error, critical)",
+                default=settings["log_level"],
+                validator=lambda x: self.validate_log_level(x) is not None
+            )
+            settings["log_level"] = self.validate_log_level(log_level)
         
         return settings
+    
+    def ask_template_choice(self) -> str:
+        """
+        Ask the user to select a configuration template
+        
+        Returns:
+            Name of the selected template
+        """
+        templates = self._get_available_templates()
+        
+        if not templates:
+            self.logger.warning("No templates available")
+            return None
+        
+        self.logger.info("Available templates:")
+        for i, template in enumerate(templates, 1):
+            self.logger.info(f"{i}. {template}")
+        
+        while True:
+            choice = self._get_input("Select a template (number or name)")
+            
+            # Try to interpret as a number
+            try:
+                index = int(choice) - 1
+                if 0 <= index < len(templates):
+                    return templates[index]
+            except ValueError:
+                # Not a number, try as a name
+                if choice in templates:
+                    return choice
+            
+            self.logger.warning("Invalid template choice")
+
+    def _get_available_templates(self) -> List[str]:
+        """
+        Get list of available configuration templates
+        
+        Returns:
+            List of template names
+        """
+        # In a real implementation, this would scan a templates directory
+        # For now, return a hardcoded list of available templates
+        return ["default", "enterprise", "minimal"]
+
+    def load_template(self, template_name: str) -> Dict[str, Any]:
+        """
+        Load a configuration template
+        
+        Args:
+            template_name: Name of the template to load
+            
+        Returns:
+            Template configuration dictionary
+        """
+        # In a real implementation, this would load from a file
+        # For now, return hardcoded templates
+        
+        if template_name == "default":
+            return {
+                "plextrac": {
+                    "instances": {
+                        "default": {
+                            "url": "https://default.plextrac.com",
+                            "verify_ssl": True
+                        }
+                    }
+                },
+                "nessus": {
+                    "csv_format": {
+                        "required_fields": ["Plugin ID", "Name", "Risk", "Description"],
+                        "optional_fields": ["Solution", "See Also"]
+                    },
+                    "categories": {
+                        "network": {
+                            "display_name": "Network Vulnerabilities",
+                            "description": "Vulnerabilities related to network configurations and services",
+                            "plugin_ids": [10180, 10287, 10386]
+                        },
+                        "webapp": {
+                            "display_name": "Web Application Vulnerabilities",
+                            "description": "Vulnerabilities found in web applications",
+                            "plugin_ids": [11219, 12345, 67890]
+                        }
+                    }
+                },
+                "output": {
+                    "directory": "plextrac_output",
+                    "screenshots": "screenshots"
+                },
+                "general": {
+                    "timeout": 30,
+                    "threads": 4,
+                    "log_level": "info"
+                }
+            }
+        elif template_name == "enterprise":
+            return {
+                "plextrac": {
+                    "instances": {
+                        "prod": {
+                            "url": "https://enterprise.plextrac.com",
+                            "verify_ssl": True
+                        },
+                        "dev": {
+                            "url": "https://dev.enterprise.plextrac.com",
+                            "verify_ssl": True
+                        }
+                    }
+                },
+                "nessus": {
+                    "csv_format": {
+                        "required_fields": ["Plugin ID", "Name", "Risk", "Description", "Solution", "See Also"],
+                        "optional_fields": ["CVSS Base Score", "CVSS Temporal Score", "References"]
+                    },
+                    "categories": {
+                        "network": {
+                            "display_name": "Network Infrastructure",
+                            "description": "Network device and service vulnerabilities",
+                            "plugin_ids": [10180, 10287, 10386, 15435, 18932]
+                        },
+                        "webapp": {
+                            "display_name": "Web Applications",
+                            "description": "Web application security issues",
+                            "plugin_ids": [11219, 12345, 67890]
+                        },
+                        "database": {
+                            "display_name": "Database Systems",
+                            "description": "Database security configurations and vulnerabilities",
+                            "plugin_ids": [20835, 23485, 26271]
+                        },
+                        "compliance": {
+                            "display_name": "Compliance Issues",
+                            "description": "Regulatory compliance violations",
+                            "plugin_ids": [30562, 32764, 38456]
+                        }
+                    }
+                },
+                "output": {
+                    "directory": "enterprise_output",
+                    "screenshots": "enterprise_screenshots"
+                },
+                "general": {
+                    "timeout": 60,
+                    "threads": 8,
+                    "log_level": "info"
+                }
+            }
+        elif template_name == "minimal":
+            return {
+                "plextrac": {
+                    "instances": {
+                        "minimal": {
+                            "url": "https://minimal.plextrac.com",
+                            "verify_ssl": True
+                        }
+                    }
+                },
+                "nessus": {
+                    "csv_format": {
+                        "required_fields": ["Plugin ID", "Name", "Risk"],
+                        "optional_fields": []
+                    },
+                    "categories": {
+                        "general": {
+                            "display_name": "General Findings",
+                            "description": "All types of findings",
+                            "plugin_ids": []
+                        }
+                    }
+                },
+                "output": {
+                    "directory": "output",
+                    "screenshots": "screenshots"
+                },
+                "general": {
+                    "timeout": 30,
+                    "threads": 2,
+                    "log_level": "warning"
+                }
+            }
+        else:
+            self.logger.warning(f"Unknown template: {template_name}")
+            return {}
+
+    def apply_template(self, template_name: str) -> Dict[str, Any]:
+        """
+        Apply a configuration template
+        
+        Args:
+            template_name: Name of the template to apply
+            
+        Returns:
+            Updated configuration dictionary
+        """
+        template = self.load_template(template_name)
+        
+        if not template:
+            self.logger.warning("Failed to load template")
+            return self.config
+        
+        # Confirm template application
+        use_template = self._get_boolean_input(
+            f"Use the '{template_name}' template as a starting point?", True
+        )
+        
+        if use_template:
+            self.config = template
+            self.logger.info(f"Applied '{template_name}' template")
+            
+            # Save the configuration
+            self._save_configuration()
+        
+        return self.config
+
+    def _save_configuration(self) -> bool:
+        """
+        Save the configuration to the specified file
+        
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            config_dir = os.path.dirname(self.config_path)
+            if config_dir and not os.path.exists(config_dir):
+                os.makedirs(config_dir, exist_ok=True)
+            
+            with open(self.config_path, 'w') as f:
+                json.dump(self.config, f, indent=4)
+            
+            self.logger.info("Configuration saved successfully")
+            return True
+        except (IOError, OSError) as e:
+            self.logger.error(f"Failed to save configuration: {str(e)}")
+            return False
     
     def _test_configuration(self) -> Tuple[bool, str]:
         """
@@ -261,6 +597,10 @@ class ConfigWizard:
         nessus_settings = self.config.get("nessus", {}).get("csv_format", {})
         if not nessus_settings.get("required_fields"):
             return False, "No required Nessus CSV fields configured"
+        
+        # Validate nessus categories
+        if "categories" not in self.config.get("nessus", {}):
+            self.logger.warning("No Nessus categories configured. It's recommended to configure at least one category.")
         
         # TODO: Implement actual API connection test if desired
         
