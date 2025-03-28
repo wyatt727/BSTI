@@ -1,0 +1,45 @@
+{
+    "grouped": true,
+    "tabs": [
+        {
+            "name": "Network Discovery",
+            "command": "nmap -sn -T4 --open $IP_RANGE | grep -E 'Nmap scan|MAC|Up' | sed 's/\\x1b\\[[0-9;]*m//g'"
+        },
+        {
+            "name": "Service Scan",
+            "command": "nmap -sV -sC -T4 -p- --open $TARGET_IP | sed 's/\\x1b\\[[0-9;]*m//g'"
+        },
+        {
+            "name": "Vulnerability Scan",
+            "command": "nmap -sV --script vuln -p $PORTS $TARGET_IP | sed 's/\\x1b\\[[0-9;]*m//g'"
+        },
+        {
+            "name": "Directory Bruteforce",
+            "command": "if command -v gobuster >/dev/null 2>&1; then gobuster dir -u http://$TARGET_IP:$WEB_PORT/ -w /usr/share/wordlists/dirb/common.txt -t 40; else echo 'Gobuster not installed'; fi"
+        },
+        {
+            "name": "SSL Check",
+            "command": "if command -v sslscan >/dev/null 2>&1; then sslscan --no-colour $TARGET_IP:$SSL_PORT; else nmap -sV --script ssl-enum-ciphers -p $SSL_PORT $TARGET_IP | sed 's/\\x1b\\[[0-9;]*m//g'; fi"
+        },
+        {
+            "name": "WHOIS Lookup",
+            "command": "whois $DOMAIN | grep -E 'Domain Name:|Registrar:|Name Server:|Creation Date:|Updated Date:|Expiration Date:|Registrant|Admin|Tech' | sed 's/\\x1b\\[[0-9;]*m//g'"
+        },
+        {
+            "name": "Subdomain Enumeration",
+            "command": "if command -v sublist3r >/dev/null 2>&1; then sublist3r -d $DOMAIN; else echo 'Sublist3r not installed. Trying alternative...'; host -l $DOMAIN ns1.$DOMAIN 2>/dev/null || echo 'Zone transfer failed'; fi"
+        },
+        {
+            "name": "DNS Enumeration",
+            "command": "for type in A AAAA CNAME MX NS SOA TXT; do echo \"\\n[$type Records]\"; host -t $type $DOMAIN; done | sed 's/\\x1b\\[[0-9;]*m//g'"
+        },
+        {
+            "name": "SMB Enumeration",
+            "command": "if command -v enum4linux >/dev/null 2>&1; then enum4linux -a $TARGET_IP | grep -E 'Account|Groups|Password|Users|Shares' | sed 's/\\x1b\\[[0-9;]*m//g'; else echo 'enum4linux not installed. Using nmap...'; nmap -p 139,445 --script smb-enum-shares,smb-enum-users $TARGET_IP | sed 's/\\x1b\\[[0-9;]*m//g'; fi"
+        },
+        {
+            "name": "SNMP Enumeration",
+            "command": "if command -v snmpwalk >/dev/null 2>&1; then snmpwalk -v 1 -c public $TARGET_IP | grep -E 'System|Network|Process|User' | head -n 50 | sed 's/\\x1b\\[[0-9;]*m//g'; else echo 'snmpwalk not installed. Using nmap...'; nmap -sU -p 161 --script snmp-interfaces,snmp-sysdescr $TARGET_IP | sed 's/\\x1b\\[[0-9;]*m//g'; fi"
+        }
+    ]
+} 

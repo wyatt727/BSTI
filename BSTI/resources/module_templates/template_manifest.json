@@ -1,0 +1,145 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2023-10-01",
+  "templates": [
+    {
+      "id": "bash_scanner",
+      "name": "Bash Network Scanner",
+      "description": "Template for creating network scanning modules using bash",
+      "file": "bash_scanner_template.sh",
+      "script_type": "bash",
+      "categories": ["network", "scanner"],
+      "complexity": "medium",
+      "requires_files": true
+    },
+    {
+      "id": "python_listener",
+      "name": "Python Network Listener",
+      "description": "Template for creating network listener modules using Python",
+      "file": "python_listener_template.py",
+      "script_type": "python",
+      "categories": ["network", "listener"],
+      "complexity": "advanced",
+      "requires_files": true
+    },
+    {
+      "id": "bash_simple",
+      "name": "Simple Bash Module",
+      "description": "Minimal template for basic bash modules",
+      "file": "bash_simple_template.sh",
+      "script_type": "bash",
+      "categories": ["general"],
+      "complexity": "beginner",
+      "requires_files": false
+    },
+    {
+      "id": "python_simple",
+      "name": "Simple Python Module",
+      "description": "Minimal template for basic Python modules",
+      "file": "python_simple_template.py",
+      "script_type": "python",
+      "categories": ["general"],
+      "complexity": "beginner",
+      "requires_files": false
+    },
+    {
+      "id": "json_multi_tab",
+      "name": "Multi-Tab JSON Module",
+      "description": "Template for creating multi-tab JSON modules",
+      "file": "json_multi_tab_template.json",
+      "script_type": "json",
+      "categories": ["ui", "multi-tab"],
+      "complexity": "medium",
+      "requires_files": false
+    },
+    {
+      "id": "bash_tmux",
+      "name": "Tmux Session Handler",
+      "description": "Template for creating modules that run in tmux sessions",
+      "file": "bash_tmux_template.sh",
+      "script_type": "bash",
+      "categories": ["terminal", "interactive"],
+      "complexity": "medium",
+      "requires_files": false
+    },
+    {
+      "id": "bash_nessus",
+      "name": "Nessus Finding Module",
+      "description": "Template for creating modules that map to Nessus findings",
+      "file": "bash_nessus_template.sh",
+      "script_type": "bash",
+      "categories": ["nessus", "reporting"],
+      "complexity": "medium",
+      "requires_files": false
+    }
+  ],
+  "categories": [
+    {
+      "id": "network",
+      "name": "Network Tools",
+      "description": "Templates for network-related operations"
+    },
+    {
+      "id": "scanner",
+      "name": "Scanning Tools",
+      "description": "Templates for scanning and enumeration"
+    },
+    {
+      "id": "listener",
+      "name": "Network Listeners",
+      "description": "Templates for creating network listeners and servers"
+    },
+    {
+      "id": "general",
+      "name": "General Purpose",
+      "description": "Templates for general purpose modules"
+    },
+    {
+      "id": "ui",
+      "name": "UI Components",
+      "description": "Templates for user interface elements"
+    },
+    {
+      "id": "multi-tab",
+      "name": "Multi-Tab Modules",
+      "description": "Templates for modules that use multiple tabs"
+    },
+    {
+      "id": "terminal",
+      "name": "Terminal Tools",
+      "description": "Templates for terminal-based operations"
+    },
+    {
+      "id": "interactive",
+      "name": "Interactive Tools",
+      "description": "Templates for interactive modules"
+    },
+    {
+      "id": "nessus",
+      "name": "Nessus Integration",
+      "description": "Templates for Nessus finding integration"
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting Tools",
+      "description": "Templates for reporting and documentation"
+    }
+  ],
+  "complexity_levels": [
+    {
+      "id": "beginner",
+      "name": "Beginner",
+      "description": "Simple templates suitable for beginners"
+    },
+    {
+      "id": "medium",
+      "name": "Intermediate",
+      "description": "Moderate complexity requiring some experience"
+    },
+    {
+      "id": "advanced",
+      "name": "Advanced",
+      "description": "Complex templates requiring more technical knowledge"
+    }
+  ]
+} 

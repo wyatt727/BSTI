@@ -1,0 +1,113 @@
+# BSTI Module Metadata Schema v2.0
+# This schema defines the structure for module metadata in the BSTI system
+
+# Module base information
+name: string                # Required: Name of the module
+description: string         # Required: Brief description of what the module does
+version: string             # Required: Semantic version (e.g., "1.0.0")
+author: string              # Required: Author's name or identifier
+creation_date: date         # Optional: Date when module was first created (YYYY-MM-DD)
+last_modified: date         # Optional: Date when module was last modified (YYYY-MM-DD)
+
+# Script information
+script_type: enum           # Required: One of ["bash", "python", "json"]
+script_path: string         # Required: Relative path to the script file
+execution_timeout: integer  # Optional: Maximum execution time in seconds (0 = no timeout)
+
+# Files required by the module
+files:                      # Optional: List of files required by the module
+  - name: string            # Required: Filename
+    description: string     # Required: Description of the file's purpose
+    required: boolean       # Optional: Whether the file is required (default: true)
+    destination: string     # Optional: Destination path on drone (default: /tmp/${filename})
+
+# Command-line arguments
+arguments:                  # Optional: List of command-line arguments
+  - name: string            # Required: Argument name
+    description: string     # Required: Description of the argument
+    default: string         # Optional: Default value
+    required: boolean       # Optional: Whether the argument is required (default: true)
+    validation: string      # Optional: Regex pattern for validation
+
+# Nessus findings
+nessus_findings:            # Optional: List of related Nessus findings
+  - string                  # Exact name of the Nessus finding
+
+# Dependencies
+dependencies:               # Optional: List of dependencies
+  - string                  # Dependency specification (e.g., "nmap >= 7.80")
+
+# Categorization
+categories:                 # Optional: List of categories for the module
+  - string                  # Category name
+
+# Platform compatibility
+platforms:                  # Optional: List of compatible platforms
+  - string                  # Platform name (e.g., "linux", "windows", "all")
+
+# Minimum BSTI version required
+min_bsti_version: string    # Optional: Minimum BSTI version required
+
+# Example usage
+examples:                   # Optional: List of usage examples
+  - description: string     # Description of the example
+    command: string         # Example command with arguments
+
+# Additional information
+notes: string               # Optional: Additional notes about the module
+references:                 # Optional: List of reference URLs
+  - string                  # Reference URL
+
+# Example module metadata
+---
+name: "SSH CBC Mode Detection"
+description: "Detects SSH servers with CBC mode ciphers enabled"
+version: "1.0.0"
+author: "Johnny Test"
+creation_date: "2023-08-15"
+last_modified: "2023-09-20"
+
+script_type: "bash"
+script_path: "network/ssh/ssh_cbc_check.sh"
+execution_timeout: 30
+
+files:
+  - name: "targets.txt"
+    description: "List of IP addresses or hostnames to target"
+    required: true
+    destination: "/tmp/targets.txt"
+
+arguments:
+  - name: "TIMEOUT"
+    description: "Timeout duration in seconds"
+    default: "5"
+    required: false
+    validation: "^[0-9]+$"
+
+nessus_findings:
+  - "SSH Server CBC Mode Ciphers Enabled"
+
+dependencies:
+  - "nmap >= 7.80"
+
+categories:
+  - "network"
+  - "ssh"
+  - "encryption"
+
+platforms:
+  - "linux"
+  - "macos"
+
+min_bsti_version: "1.5.0"
+
+examples:
+  - description: "Check a single host with default timeout"
+    command: "./ssh_cbc_check.sh 5"
+  - description: "Check multiple hosts with 10 second timeout"
+    command: "./ssh_cbc_check.sh 10"
+
+notes: "This module requires nmap to be installed on the system."
+references:
+  - "https://www.rapid7.com/db/vulnerabilities/ssh-cbc-mode/"
+  - "https://nvd.nist.gov/vuln/detail/CVE-2008-5161" 

@@ -8,11 +8,21 @@ nav_order: 4
 
 ## Introduction
 
-This guide is intended for developers who wish to contribute modules to the Bulletproof Solutions Testing Interface (BSTI). Modules are standalone scripts that can be executed within the BSTI environment. They can be written in Bash, Json or Python.
+This guide is intended for developers who wish to contribute modules to the Bulletproof Solutions Testing Interface (BSTI). Modules are standalone scripts that can be executed within the BSTI environment. They can be written in Bash, Python, or JSON.
 
-## Module Structure
+## New Module Development System
 
-Each module should follow a specific structure for compatibility with the BSTI system. This structure includes metadata sections for file requirements and command-line arguments.
+BSTI is implementing an enhanced module development system with the following improvements:
+
+1. **GUI-Based Module Editor** - A dedicated interface for creating and editing modules
+2. **Structured Metadata** - Moving from comment-based metadata to a structured format
+3. **Real-time Validation** - Automatic checks for metadata correctness and syntax
+4. **Module Templates** - Pre-defined templates for common module types
+5. **Improved Python Module Support** - Better management of Python dependencies
+
+### Current Module Structure (Legacy)
+
+Until the new system is fully implemented, modules should follow the existing structure with metadata sections for file requirements, command-line arguments, and other information embedded in comments.
 
 ### Bash Script Structure
 
@@ -44,17 +54,81 @@ Each module should follow a specific structure for compatibility with the BSTI s
 # Script Logic Here
 ```
 
-## Metadata Explanation
+## Module Metadata
 
-- `STARTFILES`/`ENDFILES`: Encloses the file requirement metadata. Each line within this section should list a file name followed by a description. These files will be requested from the user and uploaded to the drone before script execution.
-  
-- `ARGS`/`ENDARGS`: Encloses the argument metadata. Each argument should be defined on a separate line, with the argument name followed by a description. These arguments will be requested from the user at runtime.
+### Current Metadata Format (Legacy)
 
-- `AUTHOR`: Specify the author's name for the script.
+Metadata is currently defined through comment sections within module files:
 
-## Writing a Module
+- `STARTFILES`/`ENDFILES`: List of required files with descriptions
+- `ARGS`/`ENDARGS`: Command-line arguments with descriptions
+- `AUTHOR`: Module author information
+- `NESSUSFINDING`/`ENDNESSUS`: Nessus finding mapping information
 
-When writing a module, ensure you follow the above structure. Place your script logic after the metadata sections. For Bash scripts, use shell commands, and for Python scripts, standard Python syntax.
+### New Metadata Format (Coming Soon)
+
+The new system will support structured metadata in separate companion files (`module_name.meta`) using YAML or JSON format. These files will contain all metadata previously defined in comments, plus additional fields for:
+
+- Module description
+- Version information
+- Dependencies
+- Target platforms
+- Minimum BSTI version
+- Categories/tags for improved searchability
+
+Example of a future metadata file (YAML format):
+```yaml
+name: "SSH CBC Mode Detection"
+description: "Detects SSH servers with CBC mode ciphers enabled"
+version: "1.0"
+author: "Johnny Test"
+files:
+  - name: "targets.txt"
+    description: "List of IP addresses or hostnames to target"
+arguments:
+  - name: "TIMEOUT"
+    description: "Timeout duration in seconds"
+    default: "5"
+nessus_findings:
+  - "SSH Server CBC Mode Ciphers Enabled"
+dependencies:
+  - "nmap >= 7.80"
+categories:
+  - "network"
+  - "ssh"
+  - "encryption"
+```
+
+## Using the Module Editor
+
+### Current Editor (Legacy)
+
+The existing Module Editor tab allows basic editing and execution of modules:
+
+1. Select a module from the dropdown menu
+2. Edit the module code as needed
+3. Save changes with the "Save Module" button
+4. Execute with the "Execute Module" button
+
+### Enhanced Module Editor (Coming Soon)
+
+The new Module Editor will provide:
+
+1. Structured forms for editing metadata
+2. Template selection for new modules
+3. Real-time validation and syntax checking
+4. Improved code editor with better syntax highlighting
+5. Module categorization and tagging system
+6. One-click execution with argument validation
+
+## Module Development Best Practices
+
+1. **Clear Documentation**: Include detailed descriptions in all metadata fields
+2. **Robust Error Handling**: Validate inputs and handle errors gracefully
+3. **Consistent Output Format**: Follow standard output conventions for better log processing
+4. **Modularity**: Break down complex tasks into smaller, reusable functions
+5. **Testing**: Test your module thoroughly in various scenarios
+6. **Security**: Never hardcode sensitive information like credentials
 
 ### Example Bash Module
 
@@ -139,16 +213,36 @@ TARGET=$1
 nmap --script ssh2-enum-algos $TARGET 
 ```
 
-
 ## Contributing Your Module
 
-To contribute your module:
+### Current Process (Legacy)
 
-1. Fork the BSTI repository.
-2. Add your module script to the appropriate directory (`/modules`).
-3. Create a pull request with a brief description of your module and its functionality.
+To contribute using the current system:
 
-Your module will be reviewed by the BSTI maintainers and, upon approval, integrated into the system.
+1. Fork the BSTI repository
+2. Add your module script to the appropriate directory (`/modules`)
+3. Ensure proper metadata formatting within comments
+4. Create a pull request with a description of your module
+
+### Future Contribution Process
+
+Once the new system is implemented:
+
+1. Fork the BSTI repository
+2. Use the in-app Module Editor to create your module
+3. Export both the script and metadata files
+4. Add these files to your fork
+5. Create a pull request with a description of your module
+
+## Migration Guide (Coming Soon)
+
+As we transition to the new system, we will provide:
+
+1. Support for both formats during the transition period
+2. A conversion tool to migrate legacy modules to the new format
+3. Documentation for manually migrating complex modules
+
+Stay tuned for updates on the implementation timeline and migration process.
 
 ## Removing ANSI Color Codes
 

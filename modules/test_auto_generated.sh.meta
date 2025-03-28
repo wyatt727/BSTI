@@ -1,0 +1,8 @@
+{
+  "author": "Auto Test",
+  "categories": ["test", "auto-generated"],
+  "description": "A module created for testing the new module system",
+  "name": "Test Auto-Generated Module",
+  "script_type": "bash",
+  "version": "1.0.0"
+}
