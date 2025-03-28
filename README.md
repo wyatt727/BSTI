@@ -306,6 +306,30 @@ While the GUI is recommended, individual tools might still be used:
 - Fixed method name mismatches in the configuration wizard and credential management modules
 - Increased overall test coverage from 19% to 22%
 
+### Testing
+The project includes a dedicated `tests` directory with all test files. To run tests:
+
+```bash
+# Run all tests
+./run_tests.sh
+
+# Run tests with verbose output
+./run_tests.sh -v
+
+# Run only specific types of tests
+./run_tests.sh --skip-ui  # Skip UI component tests
+./run_tests.sh --skip-nmb  # Skip NMB tests
+./run_tests.sh --skip-module  # Skip module system tests
+
+# Run a specific test file
+./run_tests.sh -t tests/test_nmb.py
+
+# Generate coverage reports
+./run_tests.sh --html  # Generate HTML coverage report
+```
+
+For more information, see the [tests/README.md](tests/README.md) file.
+
 ### Implementation Status
 - See the [implementation.md](implementation.md) file for detailed status of all components
 - Current focus: fixing integration tests and improving test coverage

@@ -56,13 +56,13 @@ def run_tests_with_pytest(verbose=False, test_file=None, component='all'):
         args.append(test_file)
     else:
         if component == 'home':
-            args.append('test_home_tab.py')
+            args.append('tests/test_home_tab.py')
         elif component == 'module':
-            args.append('test_module_editor_tab.py')
+            args.append('tests/test_module_editor_tab.py')
         elif component == 'logs':
-            args.append('test_view_logs_tab.py')
+            args.append('tests/test_view_logs_tab.py')
         else:  # 'all'
-            args.extend(['test_home_tab.py', 'test_module_editor_tab.py', 'test_view_logs_tab.py'])
+            args.extend(['tests/test_home_tab.py', 'tests/test_module_editor_tab.py', 'tests/test_view_logs_tab.py'])
     
     try:
         result = pytest.main(args)

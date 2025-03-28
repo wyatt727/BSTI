@@ -14,8 +14,8 @@ import subprocess
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
-# Add the current directory to sys.path to ensure modules can be imported
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+# Add the parent directory to sys.path to ensure modules can be imported
+sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
 # Import the modules directly from BSTI directory
 from BSTI.core.module_manager import ModuleManager

@@ -51,7 +51,7 @@ def run_tests_with_pytest(verbose=False, test_file=None):
     if test_file:
         args.append(test_file)
     else:
-        args.append('test_nmb.py')
+        args.append('tests/test_nmb.py')
     
     try:
         result = pytest.main(args)
@@ -108,10 +108,14 @@ def run_manual_tests():
     """Run basic manual tests on nmb.py functionality."""
     print("\nRunning basic manual tests on nmb.py:")
     
+    # Get the root directory (parent of tests directory)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    nmb_path = os.path.join(root_dir, "nmb.py")
+    
     tests = [
-        ("Testing help command", ["python", "nmb.py", "--help"]),
-        ("Testing config-wizard option", ["python", "nmb.py", "--config-wizard", "--help"]),
-        ("Testing store-credentials option", ["python", "nmb.py", "--store-credentials", "--help"])
+        ("Testing help command", ["python", nmb_path, "--help"]),
+        ("Testing config-wizard option", ["python", nmb_path, "--config-wizard", "--help"]),
+        ("Testing store-credentials option", ["python", nmb_path, "--store-credentials", "--help"])
     ]
     
     all_passed = True

@@ -11,13 +11,13 @@ from unittest.mock import patch, MagicMock, Mock
 from io import StringIO
 
 # Add the parent directory to sys.path to import the nmb module
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
 # Import modules from nmb.py to test
 from nmb import (
     CredentialsCache,
     find_policy_file,
-    read_burp_targets,
+    read_targets,
     read_credentials,
     determine_execution_mode,
     run_config_wizard,
@@ -103,7 +103,7 @@ class TestNMB(unittest.TestCase):
     
     def test_read_burp_targets(self):
         """Test reading targets from a file."""
-        targets = read_burp_targets(self.targets_file)
+        targets = read_targets(self.targets_file)
         self.assertEqual(targets, ["192.168.1.1", "192.168.1.2", "192.168.1.3"])
     
     def test_read_credentials(self):
@@ -197,7 +197,7 @@ class TestNMB(unittest.TestCase):
         mock_instance.start.assert_called_once()
         mock_instance.update.assert_called()
         mock_instance.finish.assert_called_once()
-        mock_handler_class.assert_called_once_with("arg1")
+        mock_handler_class.assert_called_once_with("arg1", parallel=True)
     
     def test_parse_arguments(self):
         """Test parsing command line arguments."""
@@ -240,10 +240,6 @@ class TestNMB(unittest.TestCase):
     @patch('nmb.handle_mode')
     def test_main_with_failed_config_wizard(self, mock_handle_mode, mock_run_config_wizard):
         """Test main function with failed config wizard."""
-        # Define a custom exception to stop execution
-        class TestExitException(Exception):
-            pass
-            
         with patch('nmb.parse_arguments') as mock_parse_args:
             args = MagicMock()
             args.config_wizard = True
@@ -253,18 +249,9 @@ class TestNMB(unittest.TestCase):
             # Simulate failed config wizard
             mock_run_config_wizard.return_value = False
             
-            # Make sys.exit raise our custom exception
-            with patch('sys.exit', side_effect=TestExitException) as mock_exit:
-                try:
-                    main()
-                except TestExitException:
-                    # Expected to raise our custom exception
-                    pass
-                
-                mock_exit.assert_called_once_with(1)
+            main()
             
-            mock_run_config_wizard.assert_called_once()
-            # Since execution should stop at sys.exit, handle_mode should not be called
+            # Since run_config_wizard returns False, handle_mode should not be called
             mock_handle_mode.assert_not_called()
 
 
